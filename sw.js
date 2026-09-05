@@ -1,8 +1,8 @@
-const CACHE = 'fbc2026-staff-shell-v2';
+const CACHE = 'fbc2026-staff-shell-v3';
 const SHELL = [
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png'
+  './manifest.webmanifest?v=3',
+  './icon-192-v2.png',
+  './icon-512-v2.png'
 ];
 
 self.addEventListener('install', event => {
@@ -32,8 +32,18 @@ self.addEventListener('fetch', event => {
 
   if (url.origin !== self.location.origin) return;
 
-  // Navigation and index.html are always network-first so GitHub Pages
-  // updates appear immediately instead of being trapped by an old cache.
+  // Always bypass HTTP cache for manifest and current icons.
+  if (
+    url.pathname.endsWith('/manifest.webmanifest') ||
+    url.pathname.endsWith('/icon-192-v2.png') ||
+    url.pathname.endsWith('/icon-512-v2.png')
+  ) {
+    event.respondWith(fetch(req, { cache: 'no-store' }));
+    return;
+  }
+
+  // Navigation and index.html are always network-first so hosting updates
+  // appear immediately instead of being trapped by an old cache.
   if (
     req.mode === 'navigate' ||
     url.pathname.endsWith('/index.html') ||
