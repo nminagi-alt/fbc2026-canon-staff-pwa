@@ -4,11 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
   <meta name="theme-color" content="#ffffff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="FBC2026 Canon">
   <title>FBC2026 Canon Visitor Registration</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=3">
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192-v2.png">
   <link rel="apple-touch-icon" href="./icon-192-v2.png">
   <style>
@@ -61,7 +57,7 @@
 
   <div id="fallback">
     画面を読み込めませんでした。通信を確認して再読み込みしてください。<br>
-    <a href="https://script.google.com/macros/s/AKfycbxZJK9vrgMsOn_bkPWKRE44ajWHSXTFdwvyW2l585AbyYitgXrPUEaZqxt3-8sqvJX52g/exec" target="_blank" rel="noopener">直接開く（予備）</a>
+    <a href="/" onclick="window.location.reload(); return false;">再読み込み</a>
   </div>
 
   <script>
@@ -72,9 +68,14 @@
     setTimeout(() => { if (!loaded) fallback.style.display = 'block'; }, 12000);
 
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {});
-      });
+      navigator.serviceWorker.getRegistrations()
+        .then(registrations => Promise.all(registrations.map(registration => registration.unregister())))
+        .catch(() => {});
+    }
+    if ('caches' in window) {
+      caches.keys()
+        .then(keys => Promise.all(keys.map(key => caches.delete(key))))
+        .catch(() => {});
     }
   </script>
 </body>
